@@ -1,51 +1,53 @@
 import os
-import osproc
 import strutils
 import times
 
-when not defined(posix):
+when defined windows:
   import wAuto
-  const bWin = "#"
-  const bCtrl = "^"
-  const bAlt = "!"
-  const bGrave = "`"
-  const bClose = "{F4}"
 else:
-  const bWin = "Super_L+"
-  const bCtrl = "Ctrl+"
-  const bAlt = "Alt+"
-  const bGrave = "grave"
-  const bClose = "w"
+  import osproc
 
 const sleepMs = 500
 
-when defined(posix):
-  proc send(s: string) =
+when not defined windows:
+  proc cmd(s: string) =
+    var s = s
+    s = s.multiReplace {
+            "!{F4}": "Ctrl+Q", "#": "Super_L+", "^": "Ctrl+", "!": "Alt+",
+            "`": "Grave", "{TAB}": "Tab", "{ENTER}": "Return", "{ESC}": "Esc"
+            }
     let cmd = "xdotool key "&s
+    echo cmd
     if 0 != execCmd cmd:
       echo "Error during: "&cmd
       quit 1
+else:
+  proc cmd(s: string) =
+    echo s
+    send(s)
 
 var counter = 0
-proc time() =
-  let f = open("current.txt", fmAppend)
+proc time(mode = fmAppend) =
+  let f = open("log.txt", mode)
   defer: f.close()
   f.writeLine counter, ": ", $now()
   inc counter
 
-proc win(s: string) = send "Super_L+"&s; sleep sleepMs
-proc ctrl(s: string) = send "Ctrl+"&s; sleep sleepMs
-proc key(s: string) = send s; sleep sleepMs
-proc tab() = key "Tab"
-proc ret() = key "Return"
-proc esc() = key "Escape"
-proc typ(s: string) = send s.split().join(" "); ret()
+proc key(s: string, delay = sleepMs) = cmd s; sleep delay
+proc win(s: string) = key "#"&s
+proc ctrl(s: string) = key "^"&s
+proc alt(s: string) = key "!"&s
+proc tab() = key "{TAB}"
+proc ret() = key "{ENTER}"
+proc esc() = key "{ESC}"
+proc typ(s: string) = cmd s.split().join(" "); ret()
+proc wait(ms: int) = echo "... " & $ms; sleep ms
 proc vscode() =
   win "1"
-  when defined(posix):
+  when not defined windows:
     win "d"
     typ "vscode"
-  sleep 10000
+  wait 10000
   for c in 'a'..'d':
     ctrl "p"
     typ $c
@@ -56,33 +58,43 @@ proc vscode() =
     ctrl "o"
     ctrl "w"
     ctrl "w"
-  ctrl bGrave
-  typ "nimble fulltest --verbose"
-  sleep 20000
-  ctrl bGrave
-  ctrl bClose
+  ctrl "`"
+  typ "nimble test"
+  wait 20000
+  ctrl "`"
+  alt "{F4}"
 
 proc browser() =
-  win "2"
-  win "w"
-  sleep 5000
+  when defined windows:
+    win "2"
+  else:
+    win "w"
+  wait 5000
   typ "youtube jess 123 video"
-  sleep 1000
+  wait 1000
+  for _ in 0..50:
+    key "{DOWN}", 100
+  for _ in 0..50:
+    key "{UP}", 100
+  for _ in 0..5:
+    key "{F5}"
+    wait 1000
   for _ in 1..19:
     tab()
   ret()
-  sleep 30000
+  wait 30000
   ctrl "w"
   ctrl "w"
   ctrl "w"
 
-time()
-while true:
-  for _ in 0..20:
+proc main() =
+  time(fmWrite)
+  while true:
     for _ in 0..10:
       vscode()
       time()
     browser()
     time()
 
+main()
 
