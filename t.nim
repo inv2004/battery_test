@@ -70,7 +70,7 @@ proc vscode() =
     ctrl "w"
   ctrl "`"
   typ "nimble test"
-  wait 10000
+  wait 20000
   ctrl "`"
   alt "{F4}"
 
