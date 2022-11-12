@@ -43,11 +43,14 @@ proc tab() = key "{TAB}"
 proc ret() = key "{ENTER}"
 proc esc() = key "{ESC}"
 proc typ(s: string) =
-  var ks: seq[string] = @[]
-  for c in s:
-    if c == ' ': ks.add "space"
-    else: ks.add $c
-  key ks.join(" "); ret()
+  when defined windows:
+    key s; ret()
+  else:
+    var ks: seq[string] = @[]
+    for c in s:
+      if c == ' ': ks.add "space"
+      else: ks.add $c
+    key ks.join(" "); ret()
 proc wait(ms: int) = echo "... " & $ms; sleep ms
 proc vscode() =
   win "1"
