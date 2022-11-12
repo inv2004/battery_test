@@ -70,7 +70,7 @@ proc vscode() =
     ctrl "w"
   ctrl "`"
   typ "nimble test"
-  wait 20000
+  wait 25000
   ctrl "`"
   alt "{F4}"
 
@@ -99,7 +99,7 @@ proc browser() =
 proc main() =
   time(fmWrite)
   while true:
-    for _ in 0..10:
+    for _ in 1..3:
       vscode()
       time()
     browser()
