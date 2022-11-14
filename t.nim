@@ -52,8 +52,9 @@ proc typ(s: string) =
       else: ks.add $c
     key ks.join(" "); ret()
 proc wait(ms: int) = echo "... " & $ms; sleep ms
-proc vscode() =
-  win "1"
+proc vscode(switch = false) =
+  if switch:
+    win "1"
   when not defined windows:
     win "d"
     typ "vscode"
@@ -69,10 +70,10 @@ proc vscode() =
     ctrl "w"
     ctrl "w"
   ctrl "`"
-  typ "nimble test"
+  typ "nimble forcetest"
   wait 25000
   ctrl "`"
-  alt "{F4}"
+  # alt "{F4}"
 
 proc browser() =
   win "2"
@@ -99,7 +100,8 @@ proc browser() =
 proc main() =
   time(fmWrite)
   while true:
-    for _ in 1..3:
+    vscode(true)
+    for _ in 2..3:
       vscode()
       time()
     browser()
