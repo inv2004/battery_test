@@ -55,9 +55,6 @@ proc wait(ms: int) = echo "... " & $ms; sleep ms
 proc vscode(switch = false) =
   if switch:
     win "1"
-  when not defined windows:
-    win "d"
-    typ "vscode"
   wait 2000
   for c in ["as", "bi", "sy", "du"]:
     ctrl "p"
