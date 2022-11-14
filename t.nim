@@ -58,7 +58,7 @@ proc vscode(switch = false) =
   when not defined windows:
     win "d"
     typ "vscode"
-  wait 10000
+  wait 2000
   for c in ["as", "bi", "sy", "du"]:
     ctrl "p"
     typ $c
@@ -71,7 +71,7 @@ proc vscode(switch = false) =
     ctrl "w"
   ctrl "`"
   typ "nimble forcetest"
-  wait 25000
+  wait 30000
   ctrl "`"
   # alt "{F4}"
 
